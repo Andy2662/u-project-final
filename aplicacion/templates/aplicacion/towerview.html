@@ -1,0 +1,151 @@
+{% extends 'aplicacion/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+
+{% block content %}
+<script>
+  function clicked(e)
+  {
+      if(!confirm('Esta seguro de que desea borrar la seleccion?')) {
+          e.preventDefault();
+      }
+  }
+  </script>
+  
+<head><title>Graficador</title></head>
+
+<script>
+
+  $(document).ready(function () {
+    
+  $('#tabla1').DataTable({
+    "language": {
+      url:"{% static 'js/Spanish.json' %}"
+    },
+  });
+  $('.dataTables_length').addClass('bs-select');
+  });
+</script>
+
+
+
+<div class="container-fluid full-width">
+  <div class="row align-items-center">
+    <div class="col-8">
+      <div class="card">
+        <div class="card-header">
+          Mapa
+        </div>
+        <div class="card-body">
+         
+          {{map|safe}}
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card">
+        <div class="card-header">
+          Opciones de filtro
+        </div>
+        <div class="card card-body">
+            <form method="get">
+              {% for field in filtro.form.visible_fields %}
+              <div class="col">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field|add_class:'form-control' }}
+                {% for error in field.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              </div>
+              {% endfor %}
+              <br>
+              <div class="card text-center">
+                <button type="submit" class="btn btn-primary btn-lg btn-block">Buscar</button>
+                   
+              </div>
+            </form>
+            <div class="card text-center">
+              <a class="btn btn-primary btn-lg btn-block" role="button" href="{% url 'towerview' %}">Resetear Busqueda</a>   
+            </div>
+        </div>
+      </div>
+    </div>  
+  </div>
+</div>
+
+
+<div class="container-fluid full-width">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <div class="btn-group">
+            <p class="fw-bolder fs-5">Resultados de la busqueda....</p>
+              
+            <div class="dropdown">
+              <button class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                Descargar...
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="{% static '/aplicacion/CSV/tmapsV1.csv' %}">Descargar CSV</a></li>
+                <li><a class="dropdown-item" href="{% static '/aplicacion/CSV/tmapsV1.xlsx' %}">Descargar xlxs</a></li>
+                
+              </ul>
+            </div>
+          </div>
+          <div class="btn-group">
+            <a href="{% static '/aplicacion/Maps/map_filtrotV1.html' %}" class="btn btn-primary btn-lg btn-block" target="_blank">Visualizar mapa en pantalla completa</a>
+          </div>
+          <div class="btn-group">
+           
+          <form method="post" id="borrar" onclick="clicked(event)" action="{% url 'borrartowers' %}">
+              {% csrf_token %} 
+            <button type="submit" name="form_type" value="borrar" class="btn btn-danger btn-lg btn-block">Borrar selección</button>   
+                     
+          </form>
+          </div>
+        </div>
+      </div>
+        <div class="card-body">
+          <table id="tabla1" class= "table table-sm mb-0">
+            <thead>
+              <tr>
+                <th >Id de la muestra: </th>
+                <th >Fecha:</th>
+                <th >CellID:</th> 
+                <th >LAC:</th>
+                <th >Red-MCC:</th>
+                <th >Cobertura:</th>
+                <th >Detalle:</th>
+                <th>Borrar:</th> 
+              </tr>
+            </thead>
+            <tbody id="myTable">
+              {% for datos in datos %}
+              <tr>
+                 
+                <td>{{datos.pk}}</td>  
+                <td>{{datos.fecha}}</td>
+                <td>{{datos.cellid}}</td> 
+                <td>{{datos.lac}}</td>
+                <td>{{datos.net}}-{{datos.mnc}}</td> 
+                <td>{{datos.cobertura}}</td>  
+                <td>{{datos.detalle}}</td>
+     
+            <td>
+              <form method="post" id="borrar" action="{% url 'borrartower' datos.pk %}">
+                {% csrf_token %} 
+                <button type="submit" name="form_type" value="borrar" class="btn btn-danger btn-sm">Borrar Entrada</button>                      
+            </form>
+            </td> 
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

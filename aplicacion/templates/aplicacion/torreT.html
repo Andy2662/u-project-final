@@ -1,0 +1,137 @@
+{% extends 'aplicacion/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+
+{% block content %}
+
+<script>
+
+  $(document).ready(function () {
+    
+  $('#tabla1').DataTable({
+    "language": {
+      url:"{% static 'js/Spanish.json' %}"
+    },
+  });
+  $('.dataTables_length').addClass('bs-select');
+  });
+</script>
+
+<head><title>Torres</title></head>
+
+<div class="container-fluid full-width">
+  <div class="row align-items-center">
+    <div class="col-8">
+      <div class="card">
+        <div class="card-header">
+          Mapa
+        </div>
+        <div class="card-body">
+          {{map|safe}}
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card">
+        <div class="card-header">
+          Buscar Torre
+        </div>
+        <div class="card card-body">
+            <form method="get">
+              {% for field in filtro.form.visible_fields %}
+              
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field|add_class:'form-control' }}
+                {% for error in field.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+             
+              {% endfor %}
+              <br>
+              <div class="card text-center">
+                <button type="submit" class="btn btn-primary btn-lg btn-block">Buscar</button>
+                   
+              </div>
+            </form>
+            <div class="card text-center">
+              <a class="btn btn-primary btn-lg btn-block" role="button" href="{% url 'torresT' %}">Resetear Busqueda</a>   
+            </div>
+        </div>
+      </div>
+    </div>  
+  </div>
+</div>
+
+
+
+<div class="container-fluid full-width">
+  <div class="row align-items-center">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="btn-group">
+            <p class="fw-bolder fs-5">Resultados de la busqueda....</p>
+              
+            <div class="dropdown">
+              <button class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                Descargar...
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="{% static '/CSV/towermap.csv' %}">Descargar CSV</a></li>
+                <li><a class="dropdown-item" href="{% static '/CSV/towermap.xlsx' %}">Descargar xlxs</a></li>
+                 
+              </ul>
+            </div>
+          </div>
+          <div class="btn-group">
+            <a href="{% static '/Maps/map_filtroT.html' %}" class="btn btn-primary btn-lg btn-block" target="_blank">Visualizar mapa en pantalla completa</a>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          Todas las torres
+        </div>
+        <div class="card-body">
+          <table id="tabla1" class= "table table-sm mb-0">
+            <thead>
+              <tr>
+                <th>CellID:</th>
+                <th>LAC:</th>
+                <th>Tecnología:</th>
+       
+                <th>Red:</th>
+                <th>Latitud-longitud:</th>
+                <th>Cobertura:</th>
+                <th>Fecha:</th>
+         
+
+
+              </tr>
+            </thead>
+            <tbody>
+              {% for datos in datos %}
+              <tr>
+                <td>{{datos.cellid}}</td> 
+                <td>{{datos.lac}}</td> 
+                <td>{{datos.tecnologia}}</td> 
+          
+                <td>{{datos.operador}}</td>
+                <td>{{datos.latitud}};{{datos.longitud}}</td>
+                <td>{{datos.cobertura}}</td>
+                <td>{{datos.fecha}}</td>
+           
+
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
